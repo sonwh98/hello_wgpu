@@ -7,6 +7,7 @@ use winit::{
     window::WindowBuilder,
 };
 
+#[cfg_attr(target_arch="wasm32", wasm_bindgen(start))]
 pub fn run() {
     env_logger::init();
     let event_loop = EventLoop::new();
