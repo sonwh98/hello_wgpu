@@ -268,7 +268,8 @@ impl State {
                 force_fallback_adapter: false,
             })
             .await
-            .unwrap();
+	    .expect("failed to get adapter");
+	
         log::warn!("device and queue");
         let (device, queue) = adapter
             .request_device(
