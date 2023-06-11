@@ -4,5 +4,5 @@ fn main() {
         dx12_shader_compiler: Default::default(),
     });
 
-    println!("hi {:?}", instance);
+    println!("instance= {:?}", instance);
 }
