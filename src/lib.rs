@@ -268,8 +268,8 @@ impl State {
                 force_fallback_adapter: false,
             })
             .await
-	    .expect("failed to get adapter");
-	
+            .expect("failed to get adapter");
+
         log::warn!("device and queue");
         let (device, queue) = adapter
             .request_device(
@@ -288,20 +288,13 @@ impl State {
                 None, // Trace path
             )
             .await
-	    .expect("Failed to create device");
+            .expect("Failed to create device");
 
         log::warn!("Surface");
-        let surface_caps = surface.get_capabilities(&adapter);
-	
-        let config = wgpu::SurfaceConfiguration {
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: surface_caps.formats[0],
-            width: size.width,
-            height: size.height,
-            present_mode: surface_caps.present_modes[0],
-            alpha_mode: surface_caps.alpha_modes[0],
-            view_formats: vec![],
-        };
+
+        let config = surface
+            .get_default_config(&adapter, size.width, size.height)
+            .unwrap();
 
         surface.configure(&device, &config);
 
