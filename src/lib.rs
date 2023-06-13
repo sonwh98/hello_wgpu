@@ -288,7 +288,7 @@ impl State {
                 None, // Trace path
             )
             .await
-            .unwrap();
+	    .expect("Failed to create device");
 
         log::warn!("Surface");
         let surface_caps = surface.get_capabilities(&adapter);
