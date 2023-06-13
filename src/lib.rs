@@ -292,26 +292,10 @@ impl State {
 
         log::warn!("Surface");
         let surface_caps = surface.get_capabilities(&adapter);
-        // Shader code in this tutorial assumes an Srgb surface texture. Using a different
-        // one will result all the colors comming out darker. If you want to support non
-        // Srgb surfaces, you'll need to account for that when drawing to the frame.
-        let surface_format = surface_caps
-            .formats
-            .iter()
-            .copied()
-	    .next()
-            // .find(|f| {
-	    // 	// let d = f.describe();
-	    // 	// let s = f.describe().srgb;
-            //     // println!("f={:?}\nd={:?}\ns={:?}",f,d,s);
-	    // 	println!("f={:?}",f);
-	    // 	true
-            // }
-	    
-            .unwrap_or(surface_caps.formats[0]);
+	
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: surface_format,
+            format: surface_caps.formats[0],
             width: size.width,
             height: size.height,
             present_mode: surface_caps.present_modes[0],
