@@ -91,9 +91,10 @@ async fn init() -> (
     };
 
     let shape: &[Vertex] = &[
-        // *vertices.get("A").unwrap(),
-        // *vertices.get("B").unwrap(),
-        // *vertices.get("E").unwrap(),
+        *vertices.get("A").unwrap(),
+        *vertices.get("B").unwrap(),
+        *vertices.get("E").unwrap(),
+	
         *vertices.get("B").unwrap(),
         *vertices.get("C").unwrap(),
         *vertices.get("E").unwrap(),
@@ -201,7 +202,6 @@ async fn init() -> (
 }
 
 fn render(
-    //encoder: &wgpu::CommandEncoder,
     device: &wgpu::Device,
     queue: &wgpu::Queue,
     surface: &wgpu::Surface,
@@ -238,7 +238,7 @@ fn render(
 
         render_pass.set_pipeline(&render_pipeline);
         render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
-        render_pass.draw(0..3, 0..1);
+        render_pass.draw(0..6, 0..1);
     }
 
     queue.submit(iter::once(encoder.finish()));
