@@ -12,5 +12,5 @@ log = "0.4.20"
 maplit = "1.0.2"
 pollster = "0.3.0"
 wgpu = "0.17"
-winit = "0.28.6"
+winit = "0.28.7"
 
