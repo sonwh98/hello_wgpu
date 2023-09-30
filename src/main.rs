@@ -39,6 +39,7 @@ impl Vertex {
 async fn init(
     window: &winit::window::Window,
 ) -> (
+    wgpu::Instance,
     wgpu::Adapter,
     wgpu::Device,
     wgpu::Queue,
@@ -180,6 +181,7 @@ async fn init(
     });
 
     (
+        instance,
         adapter,
         device,
         queue,
@@ -241,7 +243,8 @@ async fn run() {
         .build(&event_loop)
         .unwrap();
 
-    let (adapter, device, queue, surface, vertex_buffer, render_pipeline) = init(&window).await;
+    let (instance, adapter, device, queue, surface, vertex_buffer, render_pipeline) =
+        init(&window).await;
 
     event_loop.run(move |event, _, control_flow| {
         println!("event={:?}", event);
