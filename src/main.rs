@@ -252,7 +252,6 @@ async fn run() {
         init().await;
 
     event_loop.run(move |event, _, control_flow| {
-        //println!("event= {:?}", event);
         match event {
             winit::event::Event::WindowEvent {
                 ref event,
@@ -271,8 +270,10 @@ async fn run() {
                     } => *control_flow = ControlFlow::Exit,
                     winit::event::WindowEvent::Resized(physical_size) => {
                         //state.resize(*physical_size);
+			println!("foo1");
                     }
                     winit::event::WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
+			println!("foo2");
                         // new_inner_size is &mut so w have to dereference it twice
                         //state.resize(**new_inner_size);
                         //render();
