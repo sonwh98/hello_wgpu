@@ -41,12 +41,12 @@ impl Vertex {
     }
 }
 
-async fn init() -> (
+async fn init(
+    window: &winit::window::Window,
+) -> (
     wgpu::Adapter,
     wgpu::Device,
     wgpu::Queue,
-    winit::event_loop::EventLoop<()>,
-    winit::window::Window,
     wgpu::Surface,
     wgpu::Buffer,
     wgpu::RenderPipeline,
@@ -74,10 +74,6 @@ async fn init() -> (
         .await
         .unwrap();
 
-    let event_loop = winit::event_loop::EventLoop::new();
-    let window = winit::window::WindowBuilder::new()
-        .build(&event_loop)
-        .unwrap();
     let size = window.inner_size();
 
     let surface = unsafe { instance.create_surface(&window) }.unwrap();
@@ -94,7 +90,6 @@ async fn init() -> (
         *vertices.get("A").unwrap(),
         *vertices.get("B").unwrap(),
         *vertices.get("E").unwrap(),
-	
         *vertices.get("B").unwrap(),
         *vertices.get("C").unwrap(),
         *vertices.get("E").unwrap(),
@@ -193,8 +188,6 @@ async fn init() -> (
         adapter,
         device,
         queue,
-        event_loop,
-        window,
         surface,
         vertex_buffer,
         render_pipeline,
@@ -248,10 +241,16 @@ fn render(
 }
 
 async fn run() {
-    let (adapter, device, queue, event_loop, window, surface, vertex_buffer, render_pipeline) =
-        init().await;
+    let event_loop = winit::event_loop::EventLoop::new();
+    let window = winit::window::WindowBuilder::new()
+        .build(&event_loop)
+        .unwrap();
+
+    let (adapter, device, queue, surface, vertex_buffer, render_pipeline) = init(&window).await;
 
     event_loop.run(move |event, _, control_flow| {
+        println!("event={:?}", event);
+
         match event {
             winit::event::Event::WindowEvent {
                 ref event,
@@ -270,10 +269,10 @@ async fn run() {
                     } => *control_flow = ControlFlow::Exit,
                     winit::event::WindowEvent::Resized(physical_size) => {
                         //state.resize(*physical_size);
-			println!("foo1");
+                        println!("foo1");
                     }
                     winit::event::WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-			println!("foo2");
+                        println!("foo2");
                         // new_inner_size is &mut so w have to dereference it twice
                         //state.resize(**new_inner_size);
                         //render();
