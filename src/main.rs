@@ -6,8 +6,6 @@ use winit::event_loop::ControlFlow;
 
 use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode};
 
-use bytemuck::Pod;
-
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct Vertex {
@@ -36,9 +34,7 @@ impl Vertex {
     }
 }
 
-async fn init(
-    window: &winit::window::Window,
-) -> (wgpu::Instance, wgpu::Adapter, wgpu::Device, wgpu::Queue) {
+async fn init() -> (wgpu::Instance, wgpu::Adapter, wgpu::Device, wgpu::Queue) {
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::default());
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions::default())
@@ -235,7 +231,7 @@ async fn run() {
         .build(&event_loop)
         .unwrap();
 
-    let (instance, adapter, device, queue) = init(&window).await;
+    let (instance, adapter, device, queue) = init().await;
 
     let (surface, vertex_buffer, render_pipeline) = init2(&window, instance, adapter, &device);
 
