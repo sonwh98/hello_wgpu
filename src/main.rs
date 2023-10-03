@@ -282,7 +282,7 @@ async fn run() {
                         // new_inner_size is &mut so w have to dereference it twice
                         //state.resize(**new_inner_size);
 			resize(&device, &surface, &mut config, **new_inner_size);
-                        render(&device, &queue, &surface, &vertex_buffer, &render_pipeline);
+                        let _ = render(&device, &queue, &surface, &vertex_buffer, &render_pipeline);
                     }
                     _ => {}
                 }
