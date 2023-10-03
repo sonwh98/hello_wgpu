@@ -66,7 +66,12 @@ fn init2(
     instance: wgpu::Instance,
     adapter: wgpu::Adapter,
     device: &wgpu::Device,
-) -> (wgpu::Surface, wgpu::Buffer, wgpu::RenderPipeline) {
+) -> (
+    wgpu::Surface,
+    wgpu::SurfaceConfiguration,
+    wgpu::Buffer,
+    wgpu::RenderPipeline,
+) {
     let size = window.inner_size();
 
     let surface = unsafe { instance.create_surface(&window) }.unwrap();
@@ -176,7 +181,7 @@ fn init2(
         // indicates how many array layers the attachments will have.
         multiview: None,
     });
-    (surface, vertex_buffer, render_pipeline)
+    (surface, config, vertex_buffer, render_pipeline)
 }
 
 fn render(
@@ -225,6 +230,19 @@ fn render(
     Ok(())
 }
 
+fn resize(
+    device: &wgpu::Device,
+    surface: &wgpu::Surface,
+    config: &mut wgpu::SurfaceConfiguration,
+    new_size: winit::dpi::PhysicalSize<u32>,
+) {
+    if new_size.width > 0 && new_size.height > 0 {
+        config.width = new_size.width;
+        config.height = new_size.height;
+        surface.configure(&device, &config);
+    }
+}
+
 async fn run() {
     let event_loop = winit::event_loop::EventLoop::new();
     let window = winit::window::WindowBuilder::new()
@@ -233,7 +251,8 @@ async fn run() {
 
     let (instance, adapter, device, queue) = init().await;
 
-    let (surface, vertex_buffer, render_pipeline) = init2(&window, instance, adapter, &device);
+    let (surface, mut config, vertex_buffer, render_pipeline) =
+        init2(&window, instance, adapter, &device);
 
     event_loop.run(move |event, _, control_flow| {
         println!("event={:?}", event);
@@ -255,31 +274,32 @@ async fn run() {
                         ..
                     } => *control_flow = ControlFlow::Exit,
                     winit::event::WindowEvent::Resized(physical_size) => {
-                        //state.resize(*physical_size);
+                        resize(&device, &surface, &mut config, *physical_size);
                         println!("foo1");
                     }
                     winit::event::WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                         println!("foo2");
                         // new_inner_size is &mut so w have to dereference it twice
                         //state.resize(**new_inner_size);
-                        //render();
+			resize(&device, &surface, &mut config, **new_inner_size);
+                        render(&device, &queue, &surface, &vertex_buffer, &render_pipeline);
                     }
                     _ => {}
                 }
             }
             Event::RedrawRequested(window_id) if window_id == window.id() => {
-                render(&device, &queue, &surface, &vertex_buffer, &render_pipeline);
-                // match state.render() {
-                //     Ok(_) => {}
-                //     // Reconfigure the surface if it's lost or outdated
-                //     Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
-                //         state.resize(state.size)
-                //     }
-                //     // The system is out of memory, we should probably quit
-                //     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                //     // We're ignoring timeouts
-                //     Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
-                // }
+                let result = render(&device, &queue, &surface, &vertex_buffer, &render_pipeline);
+                match result {
+                    Ok(_) => {}
+                    // Reconfigure the surface if it's lost or outdated
+                    Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
+			//resize(device, surface, config, **new_inner_size);
+                    }
+                    // The system is out of memory, we should probably quit
+                    Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+                    // We're ignoring timeouts
+                    Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
+                }
             }
             Event::MainEventsCleared => {
                 // RedrawRequested will only trigger once, unless we manually
